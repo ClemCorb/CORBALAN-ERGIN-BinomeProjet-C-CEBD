@@ -3,12 +3,24 @@ from tkinter import ttk
 from utils import display
 from utils import db
 
+def getRegions():
+        cursor = db.data.cursor()
+        result = cursor.execute("""SELECT nom_region
+                                    FROM Regions
+                                    ORDER BY nom_region""")
+        regions = []
+        regions.append("Choisir une région")
+        for row in result:
+            regions.append(row[0])
+        return regions
 class Window(tk.Toplevel):
 
     # Attributs de la classe (pour être en mesure de les utiliser dans les différentes méthodes)
     treeView = None
     input = None
     errorLabel = None
+
+
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -24,10 +36,13 @@ class Window(tk.Toplevel):
         # Affichage du label, de la case de saisie et du bouton valider
         ttk.Label(self, text='Veuillez indiquer une région :', anchor="center", font=('Helvetica', '10', 'bold')).grid(row=1, column=0)
         #TODO Q3 C'est cette partie que l'on souhaite changer pour un choix dynamique de la région
-        self.input = ttk.Entry(self)
+        
+        self.input = ttk.Combobox(self, values=getRegions(), state="readonly")
+        self.input.current(0)
+        self.input.bind('<<ComboboxSelected>>', self.searchRegion)
         self.input.grid(row=1, column=1)
-        self.input.bind('<Return>', self.searchRegion) # On bind l'appui de la touche entrée sur la case de saisie, on peut donc utiliser soit la touche entrée soit le bouton valider
-        ttk.Button(self, text='Valider', command=self.searchRegion).grid(row=1, column=2)
+        #self.input.bind('<Return>', self.searchRegion) # On bind l'appui de la touche entrée sur la case de saisie, on peut donc utiliser soit la touche entrée soit le bouton valider
+        #ttk.Button(self, text='Valider', command=self.searchRegion).grid(row=1, column=2)
 
         # On place un label sans texte, il servira à afficher les erreurs
         self.errorLabel = ttk.Label(self, anchor="center", font=('Helvetica', '10', 'bold'))
@@ -82,7 +97,10 @@ class Window(tk.Toplevel):
                     self.treeView.insert('', tk.END, values=row)
                     i += 1
                 # On affiche un message à l'utilisateur en fonction du nombre de résultats de la requête
-                if i == 0:
-                    self.errorLabel.config(foreground='orange', text="Aucun résultat pour la région \"" + region + "\" !")
-                else :
-                    self.errorLabel.config(foreground='green', text="Voici les résultats pour la région \"" + region + "\" :")
+                if region =='Choisir une région':
+                    self.errorLabel.config(foreground='Orange', text="Selectionnez une région")
+                else:
+                    if i == 0:
+                        self.errorLabel.config(foreground='orange', text="Aucun résultat pour la région \"" + region + "\" !")
+                    else :
+                        self.errorLabel.config(foreground='green', text="Voici les résultats pour la région \"" + region + "\" :")
