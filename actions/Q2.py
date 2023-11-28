@@ -5,6 +5,7 @@ from tkinter import ttk
 class Window(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
+        self.bind('<Escape>', lambda e: self.destroy())
 
         # Définition de la taille de la fenêtre, du titre et des lignes/colonnes de l'affichage grid
         display.centerWindow(600, 400, self)
@@ -17,10 +18,10 @@ class Window(tk.Toplevel):
 
         # On définit les colonnes que l'on souhaite afficher dans la fenêtre et la requête
         columns = ('nom_region', 'nom_departement', 'temperature_min_mesure')
-        query = """WITH moy_dep_reg AS (SELECT AVG(temperature_moy_mesure) AS moy, code_departement,nom_departement,nom_region
+        query = """WITH moy_dep_reg AS (SELECT ROUND(AVG(temperature_moy_mesure),2) AS moy, code_departement,nom_departement,nom_region
                     FROM Departements JOIN Mesures USING (code_departement) JOIN Regions USING(code_region)
                     GROUP BY code_departement)
-                    SELECT MIN (moy) AS temperature,nom_departement,nom_region
+                    SELECT nom_region,nom_departement,MIN (moy) AS temperature
                     FROM moy_dep_reg 
                     GROUP BY nom_region
                     ORDER BY nom_region ASC"""

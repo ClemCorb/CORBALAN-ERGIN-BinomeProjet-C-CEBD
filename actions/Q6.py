@@ -5,6 +5,7 @@ from tkinter import ttk
 class Window(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
+        self.bind('<Escape>', lambda e: self.destroy())
 
         # Définition de la taille de la fenêtre, du titre et des lignes/colonnes de l'affichage grid
         display.centerWindow(600, 400, self)

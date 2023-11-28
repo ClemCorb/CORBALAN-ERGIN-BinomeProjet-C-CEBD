@@ -24,6 +24,7 @@ class Window(tk.Toplevel):
 
     def __init__(self, parent):
         super().__init__(parent)
+        self.bind('<Escape>', lambda e: self.destroy())
 
         # Définition de la taille de la fenêtre et des lignes/colonnes
         display.centerWindow(600, 450, self)
