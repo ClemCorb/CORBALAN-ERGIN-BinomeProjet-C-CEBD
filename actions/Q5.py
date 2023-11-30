@@ -51,7 +51,6 @@ class Window(tk.Toplevel):
                 FROM Mesures M
                 JOIN Departements D ON M.code_departement = D.code_departement
                 GROUP BY D.code_departement, D.nom_departement, annee
-                ORDER BY D.code_departement,annee
             """)
             nbquery += 1
         except Exception as e:

@@ -10,6 +10,8 @@ class App(tk.Tk):
 
     def __init__(self):
         super().__init__()
+        self.bind('<Escape>', lambda e: self.destroy())
+
 
         # Définition de la taille et du titre de la fenêtre
         display.centerWindow(600, 850, self)
