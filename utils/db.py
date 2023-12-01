@@ -8,6 +8,7 @@ data.execute("PRAGMA foreign_keys = 1")
 
 # Fonction permettant d'exécuter toutes les requêtes sql d'un fichier
 # Elles doivent être séparées par un point-virgule
+
 def updateDBfile(data:sqlite3.Connection, file):
 
     # Lecture du fichier et placement des requêtes dans un tableau
@@ -34,6 +35,7 @@ def createDB():
 
 # En cas de clic sur le bouton d'insertion de données
 #TODO Q4 Modifier la fonction insertDB pour insérer les données dans les nouvelles tables
+
 def insertDB():
     try:
         # '{}' : paramètre de la requête qui doit être interprété comme une chaine de caractères dans l'insert
@@ -92,11 +94,46 @@ def insertDB():
              ['code_insee_departement', 'date_obs', 'tmin', 'tmax', 'tmoy']
         )
 
+        read_csv_file(
+            "data/csv/Communes.csv", ';',
+            "insert into Communes values ({},'{}','{}', '{}', {}, {}, {}, {}, {})",
+            ['Code Commune', 'Code Département', 'Commune', 'Statut', 'Altitude Moyenne', 'Population', 'Superficie',
+             'Code Canton', 'Code Arrondissement']
+        )
+        insertDB_travaux()
+
+
+
     except Exception as e:
         print ("L'erreur suivante s'est produite lors de l'insertion des données : " + repr(e) + ".")
     else:
         data.commit()
         print("Un jeu de test a été inséré dans la base avec succès.")
+def insertDB_travaux():
+    count=1
+    read_csv_file(
+        "data/csv/Isolation.csv", ';',
+        "insert into TravauxIsolation values ({},'{}', {}, {}, {}, '{}', '{}', {}, '{}', '{}', {}, {} )",
+        [count, 'code_departement', 'code_region', 'cout_total_ht', 'cout_induit_ht', 'date_x', 'type_logement',
+         'annee_construction', 'poste_isolation', 'isolant', 'epaisseur', 'surface']
+    )
+    count+=1
+    read_csv_file(
+        "data/csv/Chauffage.csv", ';',
+        "insert into TravauxChauffage values ({},'{}', {}, {}, {}, '{}', '{}', '{}', '{}', '{}', '{}', '{}' )",
+        [count, 'code_departement', 'code_region', 'cout_total_ht', 'cout_induit_ht', 'date_x', 'type_logement',
+         'annee_construction', 'energie_chauffage_avt_travaux', 'energie_chauffage_installee', 'generateur', 'type_chaudiere']
+    )
+    count+=1
+    read_csv_file(
+        "data/csv/Photovoltaique.csv", ';',
+        "insert into TravauxPhotovoltaique values ({},'{}', {}, {}, {}, '{}', '{}', '{}', {}, '{}')",
+        [count, 'code_departement', 'code_region', 'cout_total_ht', 'cout_induit_ht', 'date_x', 'type_logement',
+         'annee_construction', 'puissance_installee', 'type_panneaux']
+    )
+    count+=1
+
+
 
 # En cas de clic sur le bouton de suppression de la base
 def deleteDB():
