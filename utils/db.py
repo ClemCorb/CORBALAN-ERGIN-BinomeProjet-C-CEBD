@@ -6,6 +6,7 @@ import pandas
 data = sqlite3.connect("data/climat_france.db")
 data.execute("PRAGMA foreign_keys = 1")
 
+
 # Fonction permettant d'exécuter toutes les requêtes sql d'un fichier
 # Elles doivent être séparées par un point-virgule
 
@@ -109,23 +110,24 @@ def insertDB():
     else:
         data.commit()
         print("Un jeu de test a été inséré dans la base avec succès.")
+
 def insertDB_travaux():
-    count=1
-    read_csv_file(
+    count = 1
+    read_csv_travaux(
         "data/csv/Isolation.csv", ';',
         "insert into TravauxIsolation values ({},'{}', {}, {}, {}, '{}', '{}', {}, '{}', '{}', {}, {} )",
         [count, 'code_departement', 'code_region', 'cout_total_ht', 'cout_induit_ht', 'date_x', 'type_logement',
          'annee_construction', 'poste_isolation', 'isolant', 'epaisseur', 'surface']
     )
     count+=1
-    read_csv_file(
+    read_csv_travaux(
         "data/csv/Chauffage.csv", ';',
         "insert into TravauxChauffage values ({},'{}', {}, {}, {}, '{}', '{}', '{}', '{}', '{}', '{}', '{}' )",
         [count, 'code_departement', 'code_region', 'cout_total_ht', 'cout_induit_ht', 'date_x', 'type_logement',
          'annee_construction', 'energie_chauffage_avt_travaux', 'energie_chauffage_installee', 'generateur', 'type_chaudiere']
     )
     count+=1
-    read_csv_file(
+    read_csv_travaux(
         "data/csv/Photovoltaique.csv", ';',
         "insert into TravauxPhotovoltaique values ({},'{}', {}, {}, {}, '{}', '{}', '{}', {}, '{}')",
         [count, 'code_departement', 'code_region', 'cout_total_ht', 'cout_induit_ht', 'date_x', 'type_logement',
@@ -170,3 +172,27 @@ def read_csv_file(csvFile, separator, query, columns):
         except IntegrityError as err:
             print(err)
 
+def read_csv_travaux(csvFile, separator, query, columns):
+     # Lecture du fichier CSV csvFile avec le séparateur separator
+    # pour chaque ligne, exécution de query en la formatant avec les colonnes columns
+    df = pandas.read_csv(csvFile, sep=separator)
+    df = df.where(pandas.notnull(df), 'null')
+
+    cursor = data.cursor()
+    for ix, row in df.iterrows():
+        try:
+            tab = []
+            for i in range(len(columns)):
+                # pour échapper les noms avec des apostrophes, on remplace dans les chaines les ' par ''
+                if isinstance(row[columns[i]], str):
+                    row[columns[i]] = row[columns[i]].replace("'","''")
+                tab.append(row[columns[i]])
+
+            formatedQuery = query.format(*tab)
+
+            # On affiche la requête pour comprendre la construction ou débugger !
+            print(formatedQuery)
+
+            cursor.execute(formatedQuery)
+        except IntegrityError as err:
+            print(err)
