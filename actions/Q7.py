@@ -178,18 +178,22 @@ class Window(tk.Toplevel):
             self.id_travaux_entry = ttk.Entry(self)
             self.id_travaux_entry.grid(row=4, column=0)
             ttk.Button(self, text='Suprimer', command=self.suprimerPhotovoltaique).grid(row=7, column=0)
+    
+    def getMaxId(self):
+        cursor = db.data.cursor()
+        id_travaux_phot = cursor.execute("""SELECT MAX(id_travaux) FROM TravauxPhotovoltaique""").fetchone()[0] + 1
+        id_travaux_chauff = cursor.execute("""SELECT MAX(id_travaux) FROM TravauxChauffage""").fetchone()[0] + 1
+        id_travaux_isol = cursor.execute("""SELECT MAX(id_travaux) FROM TravauxIsolation""").fetchone()[0] + 1
+        return max(id_travaux_phot,id_travaux_chauff,id_travaux_isol)
         
     def ajoutPhotovoltaique(self):
-        query="""INSERT INTO Photovoltaique (id_travaux,cout_total_ht,cout_induit_ht,annee_travaux,
+        query="""INSERT INTO TravauxPhotovoltaique (id_travaux,cout_total_ht,cout_induit_ht,annee_travaux,
                                     code_departement,code_region,type_logement,anne_construction_logement,
                                     puissance_installee,type_panneaux) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"""
-        
+        id_travaux = self.getMaxId()
         try:
+            
             cursor = db.data.cursor()
-            id_travaux_phot = cursor.execute("""SELECT MAX(id_travaux) FROM Photovoltaique""").fetchone()[0] + 1
-            id_travaux_chauff = cursor.execute("""SELECT MAX(id_travaux) FROM Chauffage""").fetchone()[0] + 1
-            id_travaux_isol = cursor.execute("""SELECT MAX(id_travaux) FROM Isolation""").fetchone()[0] + 1
-            id_travaux=max(id_travaux_phot,id_travaux_chauff,id_travaux_isol)
             result = cursor.execute(query, (id_travaux, self.cout_total_ht.get(), self.cout_induit_ht.get(),
                                             self.annee_travaux.get(), self.code_departement.get(), self.code_region.get(),
                                             self.type_logement.get(), self.anne_construction_logement.get(),
@@ -202,16 +206,13 @@ class Window(tk.Toplevel):
             self.errorLabel.config(foreground='green', text="Ajout réussi !")
             
     def ajoutChauffage(self):
-        query="""INSERT INTO Chauffage (id_travaux,cout_total_ht,cout_induit_ht,annee_travaux,
+        query="""INSERT INTO TrvauxChauffage (id_travaux,cout_total_ht,cout_induit_ht,annee_travaux,
                                     code_departement,code_region,type_logement,anne_construction_logement,
                                     energie_avant_travaux,energie_installee,generateur,type_chaudiere)
                                     VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"""
+        id_travaux = self.getMaxId()
         try:
             cursor = db.data.cursor()
-            id_travaux_phot = cursor.execute("""SELECT MAX(id_travaux) FROM Photovoltaique""").fetchone()[0] + 1
-            id_travaux_chauff = cursor.execute("""SELECT MAX(id_travaux) FROM Chauffage""").fetchone()[0] + 1
-            id_travaux_isol = cursor.execute("""SELECT MAX(id_travaux) FROM Isolation""").fetchone()[0] + 1
-            id_travaux=max(id_travaux_phot,id_travaux_chauff,id_travaux_isol)
             result = cursor.execute(query, (id_travaux, self.cout_total_ht.get(), self.cout_induit_ht.get(),
                                             self.annee_travaux.get(), self.code_departement.get(), self.code_region.get(),
                                             self.type_logement.get(), self.anne_construction_logement.get(),
@@ -225,16 +226,13 @@ class Window(tk.Toplevel):
             self.errorLabel.config(foreground='green', text="Ajout réussi !")
             
     def ajoutIsolation(self):
-        query="""INSERT INTO Isolation (id_travaux,cout_total_ht,cout_induit_ht,annee_travaux,
+        query="""INSERT INTO TravauxIsolation (id_travaux,cout_total_ht,cout_induit_ht,annee_travaux,
                                     code_departement,code_region,type_logement,anne_construction_logement,
                                     poste_isolation,type_isolant,epaisseur_isolant,surface)
                                     VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"""
+        id_travaux = self.getMaxId()
         try:
             cursor = db.data.cursor()
-            id_travaux_phot = cursor.execute("""SELECT MAX(id_travaux) FROM Photovoltaique""").fetchone()[0] + 1
-            id_travaux_chauff = cursor.execute("""SELECT MAX(id_travaux) FROM Chauffage""").fetchone()[0] + 1
-            id_travaux_isol = cursor.execute("""SELECT MAX(id_travaux) FROM Isolation""").fetchone()[0] + 1
-            id_travaux=max(id_travaux_phot,id_travaux_chauff,id_travaux_isol)
             result = cursor.execute(query, (id_travaux, self.cout_total_ht.get(), self.cout_induit_ht.get(),
                                             self.annee_travaux.get(), self.code_departement.get(), self.code_region.get(),
                                             self.type_logement.get(), self.anne_construction_logement.get(),
