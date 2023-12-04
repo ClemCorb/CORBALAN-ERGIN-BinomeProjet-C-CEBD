@@ -109,29 +109,32 @@ def insertDB():
     else:
         data.commit()
         print("Un jeu de test a été inséré dans la base avec succès.")
+
+global_variable = 1
+def increment_global():
+    global global_variable
+    global_variable += 1
 def insertDB_travaux():
-    count=1
     read_csv_file(
         "data/csv/Isolation.csv", ';',
         "insert into TravauxIsolation values ({},'{}', {}, {}, {}, '{}', '{}', {}, '{}', '{}', {}, {} )",
-        [count, 'code_departement', 'code_region', 'cout_total_ht', 'cout_induit_ht', 'date_x', 'type_logement',
+        [global_variable, 'code_departement', 'code_region', 'cout_total_ht', 'cout_induit_ht', 'date_x', 'type_logement',
          'annee_construction', 'poste_isolation', 'isolant', 'epaisseur', 'surface']
     )
-    count+=1
     read_csv_file(
         "data/csv/Chauffage.csv", ';',
         "insert into TravauxChauffage values ({},'{}', {}, {}, {}, '{}', '{}', '{}', '{}', '{}', '{}', '{}' )",
-        [count, 'code_departement', 'code_region', 'cout_total_ht', 'cout_induit_ht', 'date_x', 'type_logement',
+        [global_variable, 'code_departement', 'code_region', 'cout_total_ht', 'cout_induit_ht', 'date_x', 'type_logement',
          'annee_construction', 'energie_chauffage_avt_travaux', 'energie_chauffage_installee', 'generateur', 'type_chaudiere']
     )
-    count+=1
     read_csv_file(
         "data/csv/Photovoltaique.csv", ';',
         "insert into TravauxPhotovoltaique values ({},'{}', {}, {}, {}, '{}', '{}', '{}', {}, '{}')",
-        [count, 'code_departement', 'code_region', 'cout_total_ht', 'cout_induit_ht', 'date_x', 'type_logement',
+        [global_variable, 'code_departement', 'code_region', 'cout_total_ht', 'cout_induit_ht', 'date_x', 'type_logement',
          'annee_construction', 'puissance_installee', 'type_panneaux']
     )
-    count+=1
+
+increment_global()
 
 
 
