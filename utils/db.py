@@ -6,6 +6,7 @@ import pandas
 data = sqlite3.connect("data/climat_france.db")
 data.execute("PRAGMA foreign_keys = 1")
 
+
 # Fonction permettant d'exécuter toutes les requêtes sql d'un fichier
 # Elles doivent être séparées par un point-virgule
 
@@ -110,31 +111,29 @@ def insertDB():
         data.commit()
         print("Un jeu de test a été inséré dans la base avec succès.")
 
-global_variable = 1
-def increment_global():
-    global global_variable
-    global_variable += 1
 def insertDB_travaux():
-    read_csv_file(
+    count = 1
+    read_csv_travaux(
         "data/csv/Isolation.csv", ';',
         "insert into TravauxIsolation values ({},'{}', {}, {}, {}, '{}', '{}', {}, '{}', '{}', {}, {} )",
-        [global_variable, 'code_departement', 'code_region', 'cout_total_ht', 'cout_induit_ht', 'date_x', 'type_logement',
+        [count, 'code_departement', 'code_region', 'cout_total_ht', 'cout_induit_ht', 'date_x', 'type_logement',
          'annee_construction', 'poste_isolation', 'isolant', 'epaisseur', 'surface']
     )
-    read_csv_file(
+    count+=1
+    read_csv_travaux(
         "data/csv/Chauffage.csv", ';',
         "insert into TravauxChauffage values ({},'{}', {}, {}, {}, '{}', '{}', '{}', '{}', '{}', '{}', '{}' )",
-        [global_variable, 'code_departement', 'code_region', 'cout_total_ht', 'cout_induit_ht', 'date_x', 'type_logement',
+        [count, 'code_departement', 'code_region', 'cout_total_ht', 'cout_induit_ht', 'date_x', 'type_logement',
          'annee_construction', 'energie_chauffage_avt_travaux', 'energie_chauffage_installee', 'generateur', 'type_chaudiere']
     )
-    read_csv_file(
+    count+=1
+    read_csv_travaux(
         "data/csv/Photovoltaique.csv", ';',
         "insert into TravauxPhotovoltaique values ({},'{}', {}, {}, {}, '{}', '{}', '{}', {}, '{}')",
-        [global_variable, 'code_departement', 'code_region', 'cout_total_ht', 'cout_induit_ht', 'date_x', 'type_logement',
+        [count, 'code_departement', 'code_region', 'cout_total_ht', 'cout_induit_ht', 'date_x', 'type_logement',
          'annee_construction', 'puissance_installee', 'type_panneaux']
     )
-
-increment_global()
+    count+=1
 
 
 
@@ -173,3 +172,27 @@ def read_csv_file(csvFile, separator, query, columns):
         except IntegrityError as err:
             print(err)
 
+def read_csv_travaux(csvFile, separator, query, columns):
+     # Lecture du fichier CSV csvFile avec le séparateur separator
+    # pour chaque ligne, exécution de query en la formatant avec les colonnes columns
+    df = pandas.read_csv(csvFile, sep=separator)
+    df = df.where(pandas.notnull(df), 'null')
+
+    cursor = data.cursor()
+    for ix, row in df.iterrows():
+        try:
+            tab = []
+            for i in range(len(columns)):
+                # pour échapper les noms avec des apostrophes, on remplace dans les chaines les ' par ''
+                if isinstance(row[columns[i]], str):
+                    row[columns[i]] = row[columns[i]].replace("'","''")
+                tab.append(row[columns[i]])
+
+            formatedQuery = query.format(*tab)
+
+            # On affiche la requête pour comprendre la construction ou débugger !
+            print(formatedQuery)
+
+            cursor.execute(formatedQuery)
+        except IntegrityError as err:
+            print(err)

@@ -95,7 +95,7 @@ create table TravauxPhotovoltaique(
     type_logement TEXT,
     annee_construction_logement INTEGER,
     puissance_installee INTEGER,
-    type_panneaux TEXT CHECK(type_panneaux IN("MONOCRISTALLIN","POLYCRISTALLIN")),
+    type_panneaux TEXT,
     constraint pk_photovoltaique primary key (id_travaux),
     constraint fk_1_photovoltaique foreign key (code_departement) references Departements(code_departement),
     constraint fk_2_photovoltaique foreign key (code_region) references Regions(code_region)
